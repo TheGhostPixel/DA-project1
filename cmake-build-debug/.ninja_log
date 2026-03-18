@@ -1,0 +1,7 @@
+# ninja log v6
+1	64	1773852801940605336	CMakeFiles/DA_Project_1.dir/main.cpp.o.ddi	2b07cc2a046fe53f
+64	68	1773852802003605617	CMakeFiles/DA_Project_1.dir/CXXModules.json	569553725e8af080
+64	68	1773852802003605617	CMakeFiles/DA_Project_1.dir/CXX.dd	569553725e8af080
+369	424	1773852802308606973	DA_Project_1	99e91a3d3bdbdde6
+64	68	1773852802003605617	CMakeFiles/DA_Project_1.dir/main.cpp.o.modmap	569553725e8af080
+68	369	1773852802007757805	CMakeFiles/DA_Project_1.dir/main.cpp.o	ce974b2f5c4c9c8c
