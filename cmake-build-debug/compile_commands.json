@@ -1,0 +1,14 @@
+[
+{
+  "directory": "/home/bernardo-barbosa/DA_Project_1/cmake-build-debug",
+  "command": "/usr/bin/c++ -g -std=gnu++20 -fdiagnostics-color=always -fmodules-ts -fmodule-mapper=CMakeFiles/DA_Project_1.dir/main.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o CMakeFiles/DA_Project_1.dir/main.cpp.o -c /home/bernardo-barbosa/DA_Project_1/main.cpp",
+  "file": "/home/bernardo-barbosa/DA_Project_1/main.cpp",
+  "output": "/home/bernardo-barbosa/DA_Project_1/cmake-build-debug/CMakeFiles/DA_Project_1.dir/main.cpp.o"
+},
+{
+  "directory": "/home/bernardo-barbosa/DA_Project_1/cmake-build-debug",
+  "command": "/usr/bin/c++ -g -std=gnu++20 -fdiagnostics-color=always -fmodules-ts -fmodule-mapper=CMakeFiles/DA_Project_1.dir/parser.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o CMakeFiles/DA_Project_1.dir/parser.cpp.o -c /home/bernardo-barbosa/DA_Project_1/parser.cpp",
+  "file": "/home/bernardo-barbosa/DA_Project_1/parser.cpp",
+  "output": "/home/bernardo-barbosa/DA_Project_1/cmake-build-debug/CMakeFiles/DA_Project_1.dir/parser.cpp.o"
+}
+]
