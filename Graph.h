@@ -1,279 +1,174 @@
 //
 // Created by ASUS on 3/20/2026.
 //
+//  Graph structure for the project
 
-/**
- * @file Graph.h
- * @brief Graph data structure based on the TP1 lectures template.
- *
- * We use the same Graph<T> structure shown in TP1 classes.
- * The only additions we made are for the Max-Flow algorithm:
- *   - Edge now has capacity, flow and reverseIndex fields
- *   - Graph has addFlowEdge() to add forward + reverse edges together0
-
- *   - Graph has resetFlow() to clear flow between runs
- *
- * Everything else (Vertex fields, addVertex, findVertex, etc.)
- * is exactly the same as in TP1.
- */
 
 #ifndef GRAPH_H
 #define GRAPH_H
 
 #include <vector>
 
-// We need these forward declarations because Vertex uses Edge and vice versa
 template <class T> class Edge;
 template <class T> class Graph;
 
-
-// ============================================================
-// VERTEX
-// ============================================================
-
-/**
- * @brief A node in the graph.
- *
- * Same as TP1 - stores the node value and a list of edges going out.
- * The visited/processing/indegree fields are used in BFS and DFS,
- * just like we saw in the TP1 exercises.
- *
- * @tparam T Type of the value stored in this node
- */
+/// @brief A vertex (node) in the graph. Same as TP, we just added path for BFS.
 template <class T>
 class Vertex {
 public:
-    T info;                    ///< The value stored in this node
-    std::vector<Edge<T>> adj;  ///< Edges going out from this node
-
-    // These fields are used during graph traversals (BFS, DFS)
-    // They are the same fields from TP1
-    bool visited    = false;   ///< Used in BFS - was this node visited?
-    bool processing = false;   ///< Used in DFS - is this node being processed?
-    int  indegree   = 0;       ///< Number of edges coming IN (used in topological sort)
-
-    // Used for Tarjan SCC algorithm (from TP1)
-    int low = 0;
-    int num = 0;
-
-    /**
-     * @brief Creates a vertex with the given value.
-     * @param in The value to store
-     */
     explicit Vertex(T in) : info(in) {}
 
-    /**
-     * @brief Adds an outgoing edge from this vertex to dest.
-     * @param dest     The destination vertex
-     * @param w        Weight / capacity of the edge
-     * @param revIdx   Index of the reverse edge (needed for Max-Flow)
-     * @complexity O(1)
-     */
-    void addEdge(Vertex<T>* dest, double w, int revIdx = -1);
+    /// @brief Get the value stored in this vertex.
+    T getInfo() const { return info; }
+
+    /// @brief Get outgoing edges.
+    std::vector<Edge<T>*> getAdj() const { return adj; }
+
+    /// @brief Get incoming edges (we need this for the residual graph in Edmonds-Karp).
+    std::vector<Edge<T>*> getIncoming() const { return incoming; }
+
+    /// @brief Was this vertex already visited in BFS?
+    bool isVisited() const { return visited; }
+
+    /// @brief Mark vertex as visited or not.
+    void setVisited(bool v) { visited = v; }
+
+    int getIndegree() const { return indegree; }
+    void setIndegree(int i) { indegree = i; }
+
+    /// @brief Which edge was used to reach this vertex in BFS. We need this to reconstruct the augmenting path.
+    Edge<T>* getPath() const { return path; }
+    void setPath(Edge<T>* p) { path = p; }
 
     friend class Graph<T>;
+
+private:
+    T info;
+    std::vector<Edge<T>*> adj;       // outgoing edges
+    std::vector<Edge<T>*> incoming;  // incoming edges
+    bool visited = false;
+    bool processing = false;
+    int indegree = 0;
+    int low = 0, num = 0;
+    Edge<T>* path = nullptr;  // edge used to get here in BFS
 };
 
-
-// ============================================================
-// EDGE
-// ============================================================
-
-/**
- * @brief An edge in the graph going from one vertex to another.
- *
- * In TP1 an edge only had dest and weight.
- * We added three new fields for the Max-Flow algorithm:
- *
- *   capacity     = how much flow this edge can carry (same as weight at start)
- *   flow         = how much flow is going through right now
- *   reverseIndex = where to find the reverse edge in dest->adj
- *
- * The reverse edge is required by Ford-Fulkerson / Edmonds-Karp.
- * When we send flow A->B, we need a reverse edge B->A so the
- * algorithm can cancel that flow later if a better path is found.
- *
- * @tparam T Type of vertex value
- */
+/// @brief An edge in the graph. Same as TP but we added capacity and flow for Max-Flow.
 template <class T>
 class Edge {
 public:
-    Vertex<T>* dest;     ///< Where this edge goes
-    double weight;       ///< Weight of the edge
+    Edge(Vertex<T>* orig, Vertex<T>* dest, double w)
+        : orig(orig), dest(dest), weight(w), capacity(w), flow(0.0) {}
 
-    // Max-Flow fields (added by us, not in original TP1 Edge)
-    double capacity;     ///< Max flow this edge can carry
-    double flow;         ///< Current flow going through this edge
-    int reverseIndex;    ///< Index of the reverse edge in dest->adj
+    /// @brief Where does this edge go?
+    Vertex<T>* getDest() const { return dest; }
 
-    /**
-     * @brief Creates an edge to dest with the given weight/capacity.
-     * @param d   Destination vertex
-     * @param w   Weight / capacity
-     * @param rev Index of reverse edge in dest->adj (-1 if none)
-     */
-    Edge(Vertex<T>* d, double w, int rev = -1)
-        : dest(d), weight(w), capacity(w), flow(0.0), reverseIndex(rev) {}
+    /// @brief Where does this edge come from?
+    Vertex<T>* getOrig() const { return orig; }
 
-    /**
-     * @brief How much more flow can go through this edge?
-     * @return capacity - flow
-     */
-    double residual() const { return capacity - flow; }
+    /// @brief The capacity of this edge (same as weight at the start).
+    double getWeight() const { return weight; }
+
+    /// @brief How much flow is going through this edge right now.
+    double getFlow() const { return flow; }
+
+    /// @brief Set the flow on this edge.
+    void setFlow(double f) { flow = f; }
+
+    /// @brief Get the reverse edge. We need it to update the residual graph.
+    Edge<T>* getReverse() const { return reverse; }
+    void setReverse(Edge<T>* r) { reverse = r; }
 
     friend class Graph<T>;
     friend class Vertex<T>;
+
+private:
+    Vertex<T>* orig;
+    Vertex<T>* dest;
+    double weight;
+    double capacity;
+    double flow;
+    Edge<T>* reverse = nullptr;
 };
 
-
-// ============================================================
-// GRAPH
-// ============================================================
-
-/**
- * @brief Directed graph using adjacency lists.
- *
- * This is the main data structure for the project.
- * It is based on the Graph<T> from TP1 lectures.
- *
- * We use Graph<int> where each integer represents a node in the
- * flow network:
- *   0         = source (where flow starts)
- *   1..P      = one node per submission
- *   P+1..P+R  = one node per reviewer
- *   P+R+1     = sink (where flow ends)
- *
- * @tparam T Type of vertex value (we use int)
- */
+/// @brief The graph itself. Same as TP, we added addFlowEdge() and resetFlow().
 template <class T>
 class Graph {
 public:
-    std::vector<Vertex<T>*> vertexSet; ///< All vertices in the graph
+    /// @brief Get all vertices.
+    std::vector<Vertex<T>*> getVertexSet() const { return vertexSet; }
 
-    /**
-     * @brief Destructor - frees all vertex memory.
-     */
-    ~Graph() {
-        for (auto v : vertexSet)
-            delete v;
-    }
-
-    /**
-     * @brief Finds a vertex by its value.
-     * @param in The value to search for
-     * @return Pointer to the vertex, or nullptr if not found
-     * @complexity O(V)
-     */
+    /// @brief Find a vertex by its value. Returns nullptr if not found. O(V)
     Vertex<T>* findVertex(const T& in) const {
         for (auto v : vertexSet)
             if (v->info == in) return v;
         return nullptr;
     }
 
-    /**
-     * @brief Returns the number of vertices in the graph.
-     */
-    int getNumVertex() const {
-        return (int)vertexSet.size();
-    }
+    int getNumVertex() const { return (int)vertexSet.size(); }
 
-    /**
-     * @brief Adds a new vertex with the given value.
-     * Does nothing if a vertex with this value already exists.
-     * @param in The value for the new vertex
-     * @return true if added, false if it already existed
-     * @complexity O(V)
-     */
+    /// @brief Add a vertex. Does nothing if it already exists. O(V)
     bool addVertex(const T& in) {
         if (findVertex(in) != nullptr) return false;
         vertexSet.push_back(new Vertex<T>(in));
         return true;
     }
 
-    /**
-     * @brief Adds a directed edge from src to dest.
-     * This is the original TP1 method - no reverse edge.
-     * @param src    Source vertex value
-     * @param dest   Destination vertex value
-     * @param weight Edge weight
-     * @return true if added, false if either vertex does not exist
-     * @complexity O(V)
-     */
+    /// @brief Add a normal edge (like in TP). O(V)
     bool addEdge(const T& src, const T& dest, double weight) {
         auto v1 = findVertex(src);
         auto v2 = findVertex(dest);
-        if (v1 == nullptr || v2 == nullptr) return false;
-        v1->addEdge(v2, weight);
+        if (!v1 || !v2) return false;
+        auto e = new Edge<T>(v1, v2, weight);
+        v1->adj.push_back(e);
+        v2->incoming.push_back(e);
         return true;
     }
 
-    /**
-     * @brief Adds a flow edge (forward) AND its reverse residual edge.
-     *
-     * This is our addition to the TP1 Graph for Max-Flow.
-     *
-     * For every real edge src->dest with capacity w, we also create
-     * a reverse edge dest->src with capacity 0.
-     * The reverse edge lets the algorithm "undo" flow later.
-     *
-     * Both edges store where the other one is (reverseIndex) so
-     * updating them during the algorithm is O(1).
-     *
-     * @param src    Source vertex value
-     * @param dest   Destination vertex value
-     * @param weight Capacity of the forward edge
-     * @return true if added successfully
-     * @complexity O(V)
-     */
+    /// @brief Add a flow edge + its reverse. The reverse starts with capacity 0. O(V)
     bool addFlowEdge(const T& src, const T& dest, double weight) {
         auto v1 = findVertex(src);
         auto v2 = findVertex(dest);
-        if (v1 == nullptr || v2 == nullptr) return false;
+        if (!v1 || !v2) return false;
 
-        // The reverse edge will be at position [v2->adj.size()] in v2->adj
-        // and the forward edge at [v1->adj.size()] in v1->adj
-        int revIdx = (int)v2->adj.size();
-        int fwdIdx = (int)v1->adj.size();
+        auto fwd = new Edge<T>(v1, v2, weight);  // real edge
+        auto rev = new Edge<T>(v2, v1, 0.0);     // reverse (capacity 0)
+        fwd->setReverse(rev);
+        rev->setReverse(fwd);
 
-        v1->adj.emplace_back(v2, weight, revIdx); // forward: full capacity
-        v2->adj.emplace_back(v1, 0.0,    fwdIdx); // reverse: starts at 0
-
+        v1->adj.push_back(fwd);
+        v2->adj.push_back(rev);
+        v2->incoming.push_back(fwd);
+        v1->incoming.push_back(rev);
         return true;
     }
 
-    /**
-     * @brief Resets visited and processing flags on all vertices.
-     * We call this before each BFS or DFS, same as in TP1.
-     * @complexity O(V)
-     */
+    /// @brief Reset visited flags for a new BFS. O(V)
     void resetVisited() {
         for (auto v : vertexSet) {
-            v->visited    = false;
+            v->visited = false;
             v->processing = false;
+            v->path = nullptr;
         }
     }
 
-    /**
-     * @brief Resets all edge flows to zero (keeps capacities).
-     * We use this before re-running the flow algorithm (e.g. in risk analysis).
-     * @complexity O(V + E)
-     */
+    /// @brief Set all flows back to 0 (keeps capacities). O(V+E)
     void resetFlow() {
         for (auto v : vertexSet)
-            for (auto& e : v->adj)
-                e.flow = 0.0;
+            for (auto e : v->adj)
+                e->flow = 0.0;
     }
+
+    ~Graph() {
+        for (auto v : vertexSet) {
+            for (auto e : v->adj) delete e;
+            delete v;
+        }
+    }
+
+private:
+    std::vector<Vertex<T>*> vertexSet;
 };
 
-
-// ============================================================
-// Vertex::addEdge implementation
-// Has to be here (not in .cpp) because it's a template
-// ============================================================
-
-template <class T>
-void Vertex<T>::addEdge(Vertex<T>* dest, double w, int revIdx) {
-    adj.emplace_back(dest, w, revIdx);
-}
-
 #endif // GRAPH_H
+

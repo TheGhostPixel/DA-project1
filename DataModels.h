@@ -74,7 +74,7 @@ struct Control {
  * Also records which topic domain was used to make the match
  * (useful for the output format).
  */
-struct AssignmentResult {
+struct AssignmentRecord {
     int submissionId;   ///< Which submission
     int reviewerId;     ///< Which reviewer
     int matchedDomain;  ///< The topic domain that matched

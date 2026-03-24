@@ -3,7 +3,6 @@
  * @brief Reads and parses the CSV input file.
  *
  * HOW PARSING WORKS:
- * ==================
  * The input file has 4 sections, each starting with a # marker:
  *   #Submissions  → list of paper submissions
  *   #Reviewers    → list of reviewers
@@ -17,6 +16,7 @@
  * and fills in the appropriate data structures.
  */
 
+
 #ifndef PARSER_H
 #define PARSER_H
 
@@ -24,24 +24,16 @@
 #include <vector>
 #include "DataModels.h"
 
-/**
- * @brief Parse result: contains all data read from the input CSV file.
- */
+/// @brief Everything we read from the input file.
 struct ParseResult {
-    std::vector<Submission> submissions;  ///< All submissions
-    std::vector<Reviewer> reviewers;      ///< All reviewers
-    Parameters parameters;                ///< Problem parameters
-    Control control;                      ///< Control settings
-    bool success = false;                 ///< Whether parsing succeeded
+    std::vector<Submission> submissions;
+    std::vector<Reviewer> reviewers;
+    Parameters parameters;
+    Control control;
+    bool success = false;
 };
 
-/**
- * @brief Parse the input CSV file and return all data.
- * @param filename Path to the .csv input file
- * @return ParseResult containing submissions, reviewers, parameters, control, and status
- *
- * Time complexity: O(n) where n is the number of lines in the file
- */
+/// @brief Parse the CSV file. Returns a ParseResult with all data. O(n) where n = lines
 ParseResult parseInputFile(const std::string& filename);
 
 #endif // PARSER_H

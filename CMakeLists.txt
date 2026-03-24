@@ -9,4 +9,11 @@ add_executable(DA_Project_1
         parser.h
         DataModels.h
         Graph.h
+        MaxFlow.cpp
+        MaxFlow.h
+        AssignmentSolver.cpp
+        AssignmentSolver.h
+        RiskAnalysis.cpp
+        RiskAnalysis.h
+
 )
