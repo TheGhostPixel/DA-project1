@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['hex_0',['HEX',['../_c_make_c_x_x_compiler_id_8cpp.html#a46d5d95daa1bef867bd0179594310ed5',1,'CMakeCXXCompilerId.cpp']]]
+  ['solveassignment_0',['solveAssignment',['../AssignmentSolver_8cpp.html#a5abb8fc8fc2099d63df5401fe425871e',1,'AssignmentSolver.cpp']]],
+  ['solveprimaryassignment_1',['solvePrimaryAssignment',['../AssignmentSolver_8cpp.html#a5c7b9424d9882f42f72cc62a247de158',1,'AssignmentSolver.cpp']]]
 ];

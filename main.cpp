@@ -1,5 +1,13 @@
-
-// Two modes: interactive menu or batch
+/**
+ * @file main.cpp
+ * @brief Entry point for the Conference Assignment Tool.
+ *
+ * Supports two modes:
+ * - **Interactive mode**: a text menu where the user can load a file,
+ *   view data, run the assignment solver, and do risk analysis step by step.
+ * - **Batch mode**: pass `-b input.csv [output.csv]` on the command line
+ *   to run everything automatically and write the result to a file.
+ */
 
 #include <iostream>
 #include <fstream>
@@ -11,8 +19,17 @@
 
 using namespace std;
 
-// helper: write results to any stream (cout or file)
-// this way we don't duplicate the output code
+/**
+ * @brief Write assignment results (and optionally risk analysis) to any output stream.
+ *
+ * This helper is used both for printing to the console and writing to a file,
+ * so we don't duplicate the output formatting code.
+ *
+ * @param out         The output stream (e.g. cout or an ofstream).
+ * @param res         The assignment result (pairings + missing reviews).
+ * @param riskResult  The risk analysis result (risky reviewer IDs).
+ * @param doRisk      If true, also write the risk analysis section.
+ */
 static void writeResults(ostream& out,
                          const AssignmentResult& res,
                          const RiskAnalysisResult& riskResult,
@@ -49,9 +66,17 @@ static void writeResults(ostream& out,
     }
 }
 
-// ============================================================
-// INTERACTIVE MENU
-// ============================================================
+/**
+ * @brief Interactive menu mode.
+ *
+ * Presents a text-based menu where the user can:
+ * 1. Load an input CSV file
+ * 2. List submissions
+ * 3. List reviewers
+ * 4. Show parameters
+ * 5. Run the assignment solver
+ * 6. Run risk analysis
+ */
 static void interactiveMode() {
     cout << "============================================" << endl;
     cout << "  Scientific Conference Assignment Tool" << endl;
@@ -78,7 +103,7 @@ static void interactiveMode() {
         if (choice == 0) { cout << "Goodbye!" << endl; break; }
 
         else if (choice == 1) {
-            cout << "Enter filename (.csv): ";
+            cout << "Enter filename (with .csv): ";
             string filename; cin >> filename;
             ParseResult tmp = parseInputFile(filename);
             if (tmp.success) {
@@ -137,9 +162,13 @@ static void interactiveMode() {
     }
 }
 
-// ============================================================
-// BATCH MODE
-// ============================================================
+/**
+ * @brief Batch mode: parse input, solve, and write output — no user interaction.
+ *
+ * @param inputFile  Path to the CSV input file.
+ * @param outputFile Path to the output file (default: "output.csv").
+ * @return 0 on success, 1 on error.
+ */
 static int batchMode(const string& inputFile, const string& outputFile) {
     ParseResult data = parseInputFile(inputFile);
     if (!data.success) { cerr << "[ERROR] Failed to parse: " << inputFile << endl; return 1; }
@@ -160,6 +189,13 @@ static int batchMode(const string& inputFile, const string& outputFile) {
     return 0;
 }
 
+/**
+ * @brief Program entry point.
+ *
+ * Usage:
+ * - `./DA_Project_1`                      → interactive mode
+ * - `./DA_Project_1 -b input.csv [out.csv]` → batch mode
+ */
 int main(int argc, char* argv[]) {
     if (argc >= 3 && string(argv[1]) == "-b") {
         string in = argv[2];

@@ -1,10 +1,14 @@
-//
-// Created by ASUS on 3/22/2026.
-//
-
-// try removing each reviewer one by one
-// If the assignment breaks without them, they are critical
-// O(R * V * E^2) because we run Edmonds-Karp once per reviewer
+/**
+ * @file RiskAnalysis.cpp
+ * @brief Risk analysis: identifies critical (risky) reviewers.
+ *
+ * For each reviewer, temporarily removes them from the pool and re-runs
+ * the assignment solver. If the assignment fails without that reviewer,
+ * they are considered "risky" — i.e., the system depends on them.
+ *
+ * @note Time complexity: O(R × V × E²) because we run Edmonds-Karp
+ *       once per reviewer.
+ */
 
 #include "RiskAnalysis.h"
 #include "AssignmentSolver.h"

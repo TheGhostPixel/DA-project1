@@ -1,13 +1,24 @@
-// reads the CSV input file section by section
-// The file has 4 sections: #Submissions, #Reviewers, #Parameters, #Control
-// We read line by line, figure out which section we are in, and fill the structs.
-// O(n) where n = number of lines
+/**
+ * @file parser.cpp
+ * @brief Implementation of the CSV input file parser.
+ *
+ * Reads the CSV input file section by section.
+ * The file has 4 sections marked by `#` headers:
+ * - `#Submissions`  — paper submissions
+ * - `#Reviewers`    — reviewers and their expertise
+ * - `#Parameters`   — constraints (min reviews, max reviews, etc.)
+ * - `#Control`      — what to run (assignments, risk analysis, output file)
+ *
+ * We read line by line, detect which section we are in, and fill the
+ * corresponding data structures.
+ *
+ * @note Time complexity: O(n) where n = number of lines in the file.
+ */
 
 #include "parser.h"
 #include "DataModels.h"
 
 #include <fstream>
-#include <sstream>
 #include <iostream>
 #include <set>
 #include <algorithm>

@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['architecture_5fid_0',['ARCHITECTURE_ID',['../_c_make_c_x_x_compiler_id_8cpp.html#aba35d0d200deaeb06aee95ca297acb28',1,'CMakeCXXCompilerId.cpp']]],
-  ['assignmentsolver_2ecpp_1',['AssignmentSolver.cpp',['../_assignment_solver_8cpp.html',1,'']]]
+  ['bfs_0',['bfs',['../MaxFlow_8cpp.html#a04a81371908a0681546ae53cdabfa33d',1,'MaxFlow.cpp']]]
 ];
